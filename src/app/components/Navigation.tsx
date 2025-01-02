@@ -8,6 +8,12 @@ export default function Navigation() {
           <Link href="/" className="text-blue-600 hover:underline">Home</Link>
         </li>
         <li>
+          <Link href="/login" className="text-blue-600 hover:underline">Login</Link>
+        </li>
+        <li>
+          <Link href="/account" className="text-blue-600 hover:underline">Account</Link>
+        </li>
+        <li>
           <Link href="/products" className="text-blue-600 hover:underline">Products</Link>
         </li>
         <li>
