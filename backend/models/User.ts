@@ -5,6 +5,7 @@ interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  _id: string; // added to fix the error
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
