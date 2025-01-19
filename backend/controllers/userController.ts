@@ -3,7 +3,7 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 
 const generateToken = (id: string) => {
-  return jwt.sign({ id }, 'your-jwt-secret', { expiresIn: '30d' });
+  return jwt.sign({ id }, 'jwt-secret', { expiresIn: '30d' });
 };
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
@@ -38,19 +38,23 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const loginUser: RequestHandler = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+export const loginUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+    if (user && (await user.matchPassword(password))) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
 };
