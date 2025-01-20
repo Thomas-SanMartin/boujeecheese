@@ -3,8 +3,8 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 
 const generateToken = (id: string) => {
-  return jwt.sign({ id }, 'jwt-secret', { expiresIn: '30d' });
-};
+  return jwt.sign({ id }, process.env.JWT_SECRET as string, { expiresIn: '30d' });
+}
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {

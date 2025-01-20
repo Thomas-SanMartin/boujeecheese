@@ -9,7 +9,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", // Allow local frontend
+  credentials: true,  // Allow cookies & authentication headers
+}));
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb-connection-string')
