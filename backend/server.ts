@@ -9,21 +9,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
+// Secure CORS
 app.use(cors({
-  origin: "http://localhost:3000", // Allow local frontend
-  credentials: true,  // Allow cookies & authentication headers
+  origin: "http://localhost:3000",
+  credentials: true,
 }));
 
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb-connection-string')
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB', err);
-  });
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI as string)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB Connection Error:', err));
 
+// User Authentication Routes
 app.use('/api/users', userRoutes);
 
 app.listen(PORT, () => {
