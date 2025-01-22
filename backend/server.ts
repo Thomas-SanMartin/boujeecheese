@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import userRoutes from './routes/userRoutes';
-import authRoutes from './routes/authRoutes';
+
 
 import dotenv from 'dotenv';
 
@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGODB_URI as string)
 
 // User Authentication Routes
 app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
+
 
 
 app.listen(PORT, () => {

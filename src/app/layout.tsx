@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import ClientWrapper from "./components/ClientWrapper"; // ✅ New wrapper for SessionProvider & Navigation
+import ClientWrapper from "./components/ClientWrapper"; // New wrapper for SessionProvider & Navigation
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Header />
-        <ClientWrapper>{children}</ClientWrapper> {/* ✅ Move Client Components here */}
+        <ClientWrapper>{children}</ClientWrapper> 
         <Footer />
       </body>
     </html>

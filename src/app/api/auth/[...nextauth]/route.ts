@@ -3,10 +3,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "../../../../lib/mongodb"; // MongoDB connection helper
+import clientPromise from "../../../../../lib/mongodb"; // MongoDB connection helper
 import bcrypt from "bcryptjs";
-import User from "../../../../models/User"; 
-import { connectDB } from "../../../../lib/db"; // MongoDB connection helper
+import User from "../../../../../models/User"; 
+import { connectDB } from "../../../../../lib/db"; // MongoDB connection helper
 
 export const authOptions = {
   adapter: MongoDBAdapter(clientPromise), // Store session in MongoDB
