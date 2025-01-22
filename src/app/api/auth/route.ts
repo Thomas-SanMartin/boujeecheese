@@ -5,7 +5,7 @@ import GitHubProvider from "next-auth/providers/github";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "../../../../lib/mongodb"; // MongoDB connection helper
 import bcrypt from "bcryptjs";
-import User from "../../../../models/User"; // Adjust this path if needed
+import User from "../../../../models/User"; 
 import { connectDB } from "../../../../lib/db"; // MongoDB connection helper
 
 export const authOptions = {
@@ -14,19 +14,19 @@ export const authOptions = {
     strategy: "jwt" as "jwt", // Use JWT-based authentication
   },
   providers: [
-    // 🔹 Google OAuth Provider
+    // Google OAuth Provider
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
 
-    // 🔹 GitHub OAuth Provider
+    // GitHub OAuth Provider
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     }),
 
-    // 🔹 Credentials (Email/Password) Provider
+    // Credentials (Email/Password) Provider
     CredentialsProvider({
       name: "Credentials",
       credentials: {
