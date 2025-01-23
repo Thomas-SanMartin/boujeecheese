@@ -1,32 +1,14 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "../../../../../lib/mongodb"; // MongoDB connection helper
-import bcrypt from "bcryptjs";
-import User from "../../../../../models/User"; 
-import { connectDB } from "../../../../../lib/db"; // MongoDB connection helper
+import { connectDB } from "../../../../../lib/db";
+import bcrypt from "bcrypt";
+import User from "../../../../../models/User";
 
 export const authOptions = {
-  adapter: MongoDBAdapter(clientPromise), // Store session in MongoDB
   session: {
-    strategy: "jwt" as "jwt", // Use JWT-based authentication
+    strategy: 'jwt' as 'jwt',
   },
   providers: [
-    // Google OAuth Provider
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
-
-    // GitHub OAuth Provider
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    }),
-
-    // Credentials (Email/Password) Provider
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -34,25 +16,25 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        await connectDB(); // Ensure DB connection
-
+      
+        await connectDB();
         const user = await User.findOne({ email: credentials?.email });
-
+      
         if (!user) {
           throw new Error("User not found");
         }
-
-        const isValidPassword = await bcrypt.compare(
-          credentials!.password,
-          user.password
-        );
-
+      
+        // Compare password
+        const isValidPassword = await bcrypt.compare(credentials!.password, user.password);
+      
         if (!isValidPassword) {
           throw new Error("Invalid password");
         }
-
+        
         return { id: user.id, name: user.name, email: user.email };
-      },
+      }
+      
+    ,
     }),
   ],
   callbacks: {
@@ -69,7 +51,7 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login", // Custom login page (optional)
+    signIn: "/login",
   },
 };
 

@@ -3,15 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const result = await signIn("credentials", {
       redirect: false,
@@ -21,6 +25,9 @@ export default function LoginPage() {
 
     if (result?.error) {
       setError("Invalid email or password");
+      setLoading(false);
+    } else {
+      router.push("/account"); // Redirect on success
     }
   };
 
@@ -42,6 +49,7 @@ export default function LoginPage() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           {/* Password Input */}
@@ -56,31 +64,17 @@ export default function LoginPage() {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        {/* Wallet Login */}
-        <div className="mt-6">
-          <p className="text-center text-gray-600">or</p>
-          <button
-            className="w-full mt-4 bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
-            onClick={() => console.log("Connect Wallet")}
-          >
-            Login with Wallet
-          </button>
-        </div>
-        <p className="mt-6 text-center text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-blue-600 hover:underline">
-            Sign Up
-          </Link>
-        </p>
       </div>
     </div>
   );

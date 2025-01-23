@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation"; // Use Router for redirects
 import axios from "axios";
 
 export default function SignupPage() {
+  const router = useRouter(); // Initialize router
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,14 +19,20 @@ export default function SignupPage() {
     setSuccess("");
 
     try {
-      await axios.post("/api/auth/register", { name, email, password });
-      setSuccess("User registered successfully!");
+      const response = await axios.post("/api/auth/signup", { name, email, password });
 
-      // Automatically log in after signup
-      await signIn("credentials", { email, password, redirect: true, callbackUrl: "/account" });
+      if (response.status === 201) {
+        setSuccess("User registered successfully! Redirecting to login...");
 
-    } catch (error) {
-      setError("Error registering user. Please try again.");
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        setError("Error registering user. Please try again.");
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Error registering user.");
     }
   };
 
@@ -48,6 +55,7 @@ export default function SignupPage() {
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           {/* Email Input */}
@@ -62,6 +70,7 @@ export default function SignupPage() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           {/* Password Input */}
@@ -76,6 +85,7 @@ export default function SignupPage() {
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <button

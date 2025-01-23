@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 export interface IUser extends Document {
   name: string;
@@ -22,8 +22,14 @@ const UserSchema = new Schema<IUser>({
 // Hash password before saving (for email/password authentication)
 UserSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) return next();
+
+  console.log("🔍 Raw Password Before Hashing:", this.password);
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+
+  console.log("🔍 Hashed Password Before Storing:", this.password);
+
   next();
 });
 

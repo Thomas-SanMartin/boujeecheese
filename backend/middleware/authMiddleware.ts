@@ -2,12 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
-// ✅ Extend Request Type to Include `user`
+// Extend Request Type to Include `user`
 export interface AuthRequest extends Request {
   user?: any;
 }
 
-// ✅ Authentication Middleware
+// Authentication Middleware
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token;
 
