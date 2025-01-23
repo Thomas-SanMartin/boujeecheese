@@ -1,28 +1,33 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import axios from 'axios';
+import { useState } from "react";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    try {
-      const { data } = await axios.post('http://localhost:5001/api/users/login', { email, password });
-      setSuccess('Login successful!');
-      // Token storage can be handled later
-      // localStorage.setItem('token', data.token);
-      console.log('User logged in:', data);
-    } catch (error) {
-      setError('Error logging in. Please try again.');
-      console.error('Error logging in:', error);
+    setError("");
+    setLoading(true);
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (result?.error) {
+      setError("Invalid email or password");
+      setLoading(false);
+    } else {
+      router.push("/account"); // Redirect on success
     }
   };
 
@@ -31,7 +36,6 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-md shadow-lg p-8">
         <h1 className="text-2xl font-bold mb-6 text-center">Welcome Back</h1>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {success && <p className="text-green-500 text-center mb-4">{success}</p>}
         <form onSubmit={handleSubmit}>
           {/* Email Input */}
           <div className="mb-4">
@@ -45,6 +49,7 @@ export default function LoginPage() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           {/* Password Input */}
@@ -59,31 +64,17 @@ export default function LoginPage() {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        {/* Wallet Login */}
-        <div className="mt-6">
-          <p className="text-center text-gray-600">or</p>
-          <button
-            className="w-full mt-4 bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
-            onClick={() => console.log("Connect Wallet")}
-          >
-            Login with Wallet
-          </button>
-        </div>
-        <p className="mt-6 text-center text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-blue-600 hover:underline">
-            Sign Up
-          </Link>
-        </p>
       </div>
     </div>
   );

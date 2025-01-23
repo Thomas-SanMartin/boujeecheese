@@ -1,27 +1,38 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import axios from 'axios';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation"; // Use Router for redirects
+import axios from "axios";
 
 export default function SignupPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const router = useRouter(); // Initialize router
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
+
     try {
-      const { data } = await axios.post('http://localhost:5001/api/users/register', { name, email, password });
-      setSuccess('User registered successfully!');
-      console.log('User registered:', data);
-    } catch (error) {
-      setError('Error registering user. Please try again.');
-      console.error('Error registering user:', error);
+      const response = await axios.post("/api/auth/signup", { name, email, password });
+
+      if (response.status === 201) {
+        setSuccess("User registered successfully! Redirecting to login...");
+
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        setError("Error registering user. Please try again.");
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Error registering user.");
     }
   };
 
@@ -44,6 +55,7 @@ export default function SignupPage() {
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           {/* Email Input */}
@@ -58,6 +70,7 @@ export default function SignupPage() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           {/* Password Input */}
@@ -72,9 +85,9 @@ export default function SignupPage() {
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-          {/* Signup Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
@@ -82,22 +95,6 @@ export default function SignupPage() {
             Sign Up
           </button>
         </form>
-        {/* Wallet Signup */}
-        <div className="mt-6">
-          <p className="text-center text-gray-600">or</p>
-          <button
-            className="w-full mt-4 bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
-            onClick={() => console.log("Connect Wallet")}
-          >
-            Sign Up with Wallet
-          </button>
-        </div>
-        <p className="mt-6 text-center text-gray-600">
-          Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Login
-          </Link>
-        </p>
       </div>
     </div>
   );

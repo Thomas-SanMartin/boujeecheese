@@ -1,59 +1,38 @@
-import { Request, Response, RequestHandler } from 'express';
+import { Request, Response } from 'express';
 import User from '../models/User';
-import jwt from 'jsonwebtoken';
+import { AuthRequest } from '../middleware/authMiddleware';
 
-const generateToken = (id: string) => {
-  return jwt.sign({ id }, 'jwt-secret', { expiresIn: '30d' });
-};
-
-export const registerUser = async (req: Request, res: Response): Promise<void> => {
+// Protected Profile Route (Now Uses `AuthRequest`)
+export const getUserProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const user = await User.findById(req.user?.id).select('-password');
 
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
-      res.status(400).json({ message: 'User already exists' });
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
       return;
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-    });
-
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
-    }
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-export const loginUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+// Update User Profile
+export const updateUserProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const user = await User.findById(req.user?.id);
 
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
     }
+
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    await user.save();
+
+    res.json({ message: 'Profile updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
